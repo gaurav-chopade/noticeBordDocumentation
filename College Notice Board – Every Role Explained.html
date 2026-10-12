@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>College Notice Board – Every Role Explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef3f6;--panel:#ffffff;--ink:#14232c;--mute:#56707e;--line:#cfdbe2;
+  --accent:#0b7a75;--bad:#d4472f;--gold:#e8a91d;--blue:#2d6cdf;--green:#2a9d58;--violet:#7a4fd0;--rose:#c9406a;
+  --note1:#fff2a8;--note3:#cfe8ff;--chalk:#10222b;--onnote:#1c1c1c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0e1d25;--panel:#15303c;--ink:#e9f1f4;--mute:#93b0bd;--line:#2a4a58;--accent:#35c4bb;--bad:#ff7a63;--gold:#f2bf47;--blue:#6a9bff;--green:#4cc982;--violet:#a88af0;--rose:#ef7da0;--chalk:#0a161c;--note1:#6b5f1c;--note3:#244b6b;--onnote:#f4f4f4}
+}
+:root[data-theme="dark"]{--bg:#0e1d25;--panel:#15303c;--ink:#e9f1f4;--mute:#93b0bd;--line:#2a4a58;--accent:#35c4bb;--bad:#ff7a63;--gold:#f2bf47;--blue:#6a9bff;--green:#4cc982;--violet:#a88af0;--rose:#ef7da0;--chalk:#0a161c;--note1:#6b5f1c;--note3:#244b6b;--onnote:#f4f4f4}
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Atkinson Hyperlegible',system-ui,sans-serif;line-height:1.55;font-size:16px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;margin:0;line-height:1.1}
+h2{font-size:clamp(24px,4vw,34px);font-weight:800}
+h3{font-size:18px;margin-bottom:8px}
+header.hero{background:var(--chalk);color:#e9f1f4;padding:40px 20px 30px}
+header.hero .wrap{max-width:1060px;margin:auto}
+header.hero h1{font-size:clamp(30px,6vw,54px);font-weight:800;letter-spacing:-.02em;max-width:16ch}
+header.hero p{max-width:58ch;color:#a9c3cf;margin:12px 0 0;font-size:18px}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;padding:0 10px}
+nav.tabs button{background:none;border:0;color:var(--mute);font:700 14px 'Atkinson Hyperlegible',sans-serif;padding:15px 14px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+button:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+main{max-width:1060px;margin:auto;padding:26px 18px 80px}
+section.view{display:none}section.view.on{display:block}
+.lead{color:var(--mute);max-width:72ch;margin:8px 0 20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:700 14px 'Atkinson Hyperlegible',sans-serif;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:9px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px;word-break:break-all}
+/* role picker */
+.roles{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+@media (max-width:820px){.roles{grid-template-columns:repeat(3,1fr)}}
+.rbtn{border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;padding:10px 6px;cursor:pointer;font:700 14px 'Bricolage Grotesque',sans-serif;display:flex;flex-direction:column;align-items:center;gap:6px;transition:.25s}
+.rbtn .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:15px;transition:.3s}
+.rbtn[aria-pressed="true"]{border-color:var(--rc);transform:translateY(-3px);box-shadow:0 6px 14px rgba(0,0,0,.15)}
+.rbtn[aria-pressed="true"] .av{transform:scale(1.12)}
+.persona{display:flex;gap:14px;align-items:center;margin-bottom:6px}
+.persona .big{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;color:#fff;font:800 22px 'Bricolage Grotesque';flex:none}
+.menu{display:grid;gap:4px}
+.mi{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:8px;font-size:14px;border:1px solid transparent;transition:.35s}
+.mi.off{opacity:.35;text-decoration:line-through}
+.mi.on{background:var(--note3);color:#10222b;font-weight:700}
+.mi.pop{animation:pop .5s}
+.mi small{font-size:11px;font-weight:700}
+.grp{font-size:12.5px;color:var(--mute);margin:8px 0 2px;font-weight:700}
+@keyframes pop{0%{transform:scale(.92)}60%{transform:scale(1.03)}100%{transform:none}}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.tile b{display:block;font:800 26px 'Bricolage Grotesque';color:var(--rc,var(--accent))}
+.tile span{font-size:12.5px;color:var(--mute)}
+ul.cl{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14.5px}
+ul.cl li{display:grid;grid-template-columns:22px 1fr;gap:6px;animation:slide .4s both}
+ul.cl li i{font-style:normal;font-weight:800}
+.yes i{color:var(--green)}.no i{color:var(--bad)}
+@keyframes slide{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.steps{position:relative}
+.step{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:8px 0;cursor:pointer;opacity:.5;transition:.3s}
+.step.cur{opacity:1}.step.done{opacity:.85}
+.dot{width:28px;height:28px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-weight:800;font-size:12px;transition:.3s}
+.step.done .dot{background:var(--green);color:#fff}
+.step.cur .dot{background:var(--rc);color:#fff;transform:scale(1.2);box-shadow:0 0 0 5px color-mix(in srgb,var(--rc) 25%,transparent)}
+.step p{margin:2px 0 0;font-size:14px;color:var(--mute);max-height:0;overflow:hidden;transition:max-height .4s}
+.step.cur p{max-height:120px}
+/* matrix */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{padding:9px 8px;text-align:center;border-bottom:1px solid var(--line)}
+th{font:700 13px 'Atkinson Hyperlegible';position:sticky;top:0;background:var(--panel);cursor:pointer}
+td:first-child,th:first-child{text-align:left;min-width:230px;position:sticky;left:0;background:var(--panel)}
+tr:hover td{background:color-mix(in srgb,var(--note3) 35%,var(--panel))}
+td.hl,th.hl{background:color-mix(in srgb,var(--note1) 55%,var(--panel))!important}
+.cell{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font-weight:800;font-size:14px;cursor:default;transition:transform .2s}
+.cell:hover{transform:scale(1.2)}
+.c-y{background:var(--green);color:#fff}.c-n{background:var(--bg);color:var(--mute);border:1px solid var(--line)}.c-s{background:var(--gold);color:#1c1c1c;cursor:pointer}
+/* stage */
+.stage{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:26px 6px 14px;background:var(--chalk);border-radius:14px;overflow:hidden}
+.actor{text-align:center;color:#d6e6ec;font-size:12.5px;position:relative;z-index:1}
+.actor .av{width:48px;height:48px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;color:#fff;font:800 16px 'Bricolage Grotesque';transition:.3s;opacity:.55}
+.actor.on .av{opacity:1;transform:scale(1.2);box-shadow:0 0 0 6px rgba(255,255,255,.18)}
+.actor.on{color:#fff;font-weight:700}
+.env{position:absolute;width:26px;height:20px;background:var(--note1);color:#1c1c1c;border-radius:3px;box-shadow:0 3px 8px rgba(0,0,0,.4);z-index:3;display:grid;place-items:center;font-size:11px;font-weight:800;transition:left .9s cubic-bezier(.5,0,.2,1),top .9s cubic-bezier(.5,0,.2,1),opacity .4s;pointer-events:none}
+.cap{margin-top:14px;min-height:92px}
+.cap h3{color:var(--rc)}
+.prog{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px}.prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .5s}
+/* tester */
+.gate{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0}
+.gate div.s{padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--panel);font-weight:700;font-size:13.5px;transition:.3s;opacity:.5}
+.gate div.s.on{opacity:1;border-color:var(--accent)}.gate div.s.fail{opacity:1;border-color:var(--bad);color:var(--bad)}.gate div.s.ok{opacity:1;border-color:var(--green)}
+.res{padding:14px;border-radius:12px;color:#fff;font-weight:700;margin-top:6px;animation:pop .5s}
+.shake{animation:shake .4s}@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:8px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <h1>Every role in the Notice Board, explained</h1>
+  <p>Visitor, Student, Teacher, HOD, Principal and Super Admin. See what each one sees, what each one can do, and how they work together.</p>
+</div></header>
+<nav class="tabs" role="tablist" id="tabs"></nav>
+<main>
+
+<!-- 1 EXPLORER -->
+<section class="view" id="v-role">
+  <h2>1. Pick a role</h2>
+  <p class="lead">Click a role. The menu unlocks, the dashboard numbers count up, and you see what that person can and cannot do. Roles come from the <span class="code">Role</span> enum, plus visitors who have no account.</p>
+  <div class="roles" id="roles"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="persona"><div class="big" id="pAv"></div><div><h3 style="margin:0" id="pName"></h3><div style="color:var(--mute);font-size:14px" id="pSub"></div></div></div>
+      <p id="pDesc" style="margin:10px 0 14px"></p>
+      <h3>Menu they get</h3><div class="menu" id="menu"></div>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="card"><h3>Their dashboard</h3><div class="tiles" id="tiles"></div></div>
+      <div class="card"><h3>Can do</h3><ul class="cl yes" id="can"></ul><h3 style="margin-top:14px">Cannot do</h3><ul class="cl no" id="cannot"></ul></div>
+      <div class="card"><h3>Who they can send notices to</h3><p id="aud" style="margin:0"></p></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="row" style="justify-content:space-between"><h3 style="margin:0">A day in the life</h3><button class="btn pri" id="dayPlay">Play</button></div>
+    <div class="steps" id="day" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<!-- 2 MATRIX -->
+<section class="view" id="v-mat">
+  <h2>2. Who can do what</h2>
+  <p class="lead">Green means yes, yellow means yes but only in a limited scope (click it to read the limit), grey means no. Click a column title to highlight one role. These rules live in <span class="code">NoticeAccessService</span>, <span class="code">TargetPolicy</span>, <span class="code">RegistrationService</span> and the <span class="code">@PreAuthorize</span> checks.</p>
+  <div class="tw"><table id="mx"></table></div>
+  <div class="card" id="mxNote" style="margin-top:12px;min-height:58px;color:var(--mute)">Click a yellow dot to see its limit.</div>
+</section>
+
+<!-- 3 STORY -->
+<section class="view" id="v-story">
+  <h2>3. All roles working together</h2>
+  <p class="lead">One story, start to finish. Watch the paper notes travel between people as a student joins, a teacher posts, the HOD approves, the Principal broadcasts and the admin audits.</p>
+  <div class="row" style="margin-bottom:12px"><button class="btn pri" id="sPlay">Play story</button><button class="btn" id="sPrev">Back</button><button class="btn" id="sNext">Next</button><button class="btn" id="sRestart">Restart</button></div>
+  <div class="stage" id="stage"></div>
+  <div class="card cap" id="cap"></div>
+  <div class="prog"><i id="sprog"></i></div>
+</section>
+
+<!-- 4 TESTER -->
+<section class="view" id="v-test">
+  <h2>4. Try the locks</h2>
+  <p class="lead">Pick a person and an API call. The request goes through the same gates as the real server: no token gives 401, a wrong role gives 403, and the right role gets through.</p>
+  <div class="card">
+    <div class="row">
+      <label style="display:flex;flex-direction:column;font-size:13px;color:var(--mute);gap:3px">Who is calling<select id="tWho"></select></label>
+      <label style="display:flex;flex-direction:column;font-size:13px;color:var(--mute);gap:3px;flex:1;min-width:240px">API call<select id="tApi"></select></label>
+      <button class="btn pri" id="tGo" style="align-self:end">Send request</button>
+    </div>
+    <div class="gate" id="gate"><div class="s">Token?</div>→<div class="s">SecurityConfig URL rules</div>→<div class="s">@PreAuthorize role check</div>→<div class="s">Service rules</div></div>
+    <div id="tRes"></div>
+  </div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const el=(t,a={},h='')=>{const e=document.createElement(t);for(const k in a)e.setAttribute(k,a[k]);e.innerHTML=h;return e};
+const TABS=[['role','Role explorer'],['mat','Permission matrix'],['story','All roles story'],['test','Try the locks']];
+TABS.forEach(([id,t],i)=>{const b=el('button',{role:'tab','aria-selected':i==0,'data-id':id},t);b.onclick=()=>show(id);$('#tabs').append(b)});
+function show(id){$$('section.view').forEach(s=>s.classList.toggle('on',s.id=='v-'+id));$$('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.id==id));scrollTo({top:0});history.replaceState(null,'','#'+id);stopDay();stopStory()}
+
+/* ---------- DATA ---------- */
+const ORDER=['VISITOR','STUDENT','FACULTY','HOD','PRINCIPAL','SUPER_ADMIN'];
+const R={
+ VISITOR:{label:'Visitor',init:'V',c:'--mute',sub:'No account',desc:'Anyone on the internet. Reads the public website and can apply for an account.',
+  tiles:[],aud:'Nobody. Visitors cannot create notices.',
+  can:['Read the landing page with the latest notices','Browse Engineering and Polytechnic wing pages','Read Admissions, About and Help','Search public notices by wing, category, priority, date','Download public attachments (short-lived signed link)','Register as student, teacher or HOD'],
+  cannot:['See any private notice','Open the portal (every portal URL needs a token)','Choose their own approver'],
+  day:['Opens the site and sees public notices pinned on the board','Filters notices to “Admissions”, opens one, downloads the PDF','Clicks Register and picks Student, department, semester, class','Sees: “Your request is waiting for the class teacher”','Later signs in: pending shows status, approved opens the portal']},
+ STUDENT:{label:'Student',init:'S',c:'--blue',sub:'student.cs6a@college.edu',desc:'A registered student. Receives notices meant for them and reads them in a personal feed.',
+  tiles:[['Latest',12],['Unread',4],['Important',3],['Examination',2],['Placement',1],['Events',2]],aud:'Nobody. Students cannot create notices (403 “Students cannot create notices”).',
+  can:['See a personal feed: only notices aimed at them','Read / unread markers and an urgent banner','Acknowledge notices that ask for it','Save notices to a reading list','Get in-app notifications (email for urgent/important)','Read the public notices too'],
+  cannot:['Create, edit or publish notices','Approve anyone','See other students’ private notices','Open admin pages'],
+  day:['Signs in, the dashboard shows 4 unread and an urgent banner','Opens the exam timetable, it is marked read automatically','Clicks Acknowledge on the “Fee deadline” notice','Saves the placement notice for later','Checks Notice history for expired notices']},
+ FACULTY:{label:'Teacher',init:'T',c:'--green',sub:'faculty.cs@college.edu',desc:'Faculty of one department. Writes notices for their students, but every notice needs the HOD’s approval first. May also be a class teacher.',
+  tiles:[['My notices',9],['Drafts',2],['Pending',1],['Approved',5],['Rejected',1],['For me',6]],aud:'Students of their own department only: all students, a semester, a class, or named students.',
+  can:['Create notices (AI can draft one from a short description)','Attach files with drag and drop','Submit for HOD approval; edit and resubmit after rejection','See who read and acknowledged their notices','Approve student sign-ups if they are the class teacher of that class','Make a public notice for their own wing (still goes through the HOD)'],
+  cannot:['Publish directly (403 “Faculty notices must be submitted for HOD approval”)','Target the whole college, other departments or staff','Edit a notice after it is pending or published','Approve other teachers'],
+  day:['Opens Create notice, types “Unit test next Monday” and uses the AI draft','Targets Sem 6 class A. The form shows “28 recipients” live','Clicks Submit. The HOD gets a notification. Status: Pending approval','Gets “Rejected: add the room number”, edits and resubmits','Gets “Approved”. Students are notified; the read bar fills up']},
+ HOD:{label:'HOD',init:'H',c:'--violet',sub:'hod.cs@college.edu',desc:'Head of one department (one per department). Reviews teachers’ notices and publishes their own directly.',
+  tiles:[['Dept notices',34],['Pending approvals',3],['Published',21],['Rejected',2],['My notices',6],['For me',5]],aud:'Their own department only: faculty, students, a semester, a class, or named people. Never the whole college.',
+  can:['Approve or reject teachers’ pending notices (with a reason)','Publish their own notices directly, or schedule them','Approve faculty and student sign-ups of the department','Assign class teachers','See read statistics for own and department notices','Make public notices for their own wing'],
+  cannot:['Approve notices of another department','Target other departments or the whole college','Approve Engineering vs Polytechnic across wings','Open admin pages (users, audit log)'],
+  day:['Dashboard shows “3 pending approvals”','Opens Notice approvals, reads a teacher’s notice and its timeline','Clicks Approve. It goes live (or is scheduled); the teacher is told','Approves a new teacher’s sign-up from Account requests','Assigns Ms. Shah as class teacher for Sem 6 class A']},
+ PRINCIPAL:{label:'Principal',init:'P',c:'--rose',sub:'principal@college.edu',desc:'Head of the whole college. Speaks to everyone and publishes without any approval.',
+  tiles:[['My notices',18],['Published',15],['Scheduled',2],['Drafts',1],['Urgent',3],['College active',47]],aud:'Anyone: the whole college, a role, a department, a semester, a class or named people.',
+  can:['Publish to the whole college immediately, or schedule','Mark notices urgent (email goes out to recipients)','Post public notices for Engineering, Polytechnic or both','Approve any account request, including HODs','Assign class teachers','See notices per department on the dashboard'],
+  cannot:['Manage users, departments and categories (admin only)','Read the audit log','Delete other people’s notices'],
+  day:['Writes “College closed Friday” and picks target: Whole college','Sets priority Urgent, so an email is also sent','Publishes. One click, no approval step','Approves a new HOD’s registration','Checks the dashboard: notices per department']},
+ SUPER_ADMIN:{label:'Super Admin',init:'A',c:'--bad',sub:'admin@college.edu',desc:'Runs the system. Sees everything, manages people and master data, and reads the audit log.',
+  tiles:[['Users',320],['Students',270],['Faculty',38],['HODs',6],['Departments',9],['Pending',4]],aud:'Anyone, like the Principal.',
+  can:['Open every notice and see all statistics','Delete any notice, archive published ones','Create, suspend, activate, deactivate users','Create and edit departments and notice categories','Read the full audit log of every important action','Approve accounts when no Principal exists (fallback)'],
+  cannot:['Publish a teacher’s notice on their behalf (only the HOD reviews)','Skip the JWT token and rate-limited login'],
+  day:['Dashboard: 320 users, 4 pending approvals, 2 scheduled notices','Opens Users, suspends an account with a reason','Adds a new category “Sports”','Adds a department for a new programme','Opens Audit logs to see who published what, and when']}
+};
+const MENU=[
+ ['Public website',[['Landing / home','V'],['Engineering & Polytechnic pages','VSFHPA'],['Admissions','VSFHPA'],['Public notices','VSFHPA'],['About & Help','VSFHPA'],['Register / Login','V']]],
+ ['Portal (members)',[['Dashboard','SFHPA'],['Notices (my feed)','SFHPA'],['Saved notices','SFHPA'],['Notice history','SFHPA'],['Notifications','SFHPA'],['Profile','SFHPA']]],
+ ['Staff tools',[['My notices','FHPA'],['Create notice (+AI)','FHPA'],['Notice approvals','H'],['Account requests','FHPA'],['Class teachers','HPA']]],
+ ['Admin only',[['All notices','A'],['Users','A'],['Departments','A'],['Categories','A'],['Audit logs','A']]]
+];
+const KEY={VISITOR:'V',STUDENT:'S',FACULTY:'F',HOD:'H',PRINCIPAL:'P',SUPER_ADMIN:'A'};
+
+/* ---------- EXPLORER ---------- */
+let role='STUDENT',dayTimer=null,dayCur=0,prevKey=null;
+ORDER.forEach(k=>{const r=R[k];const b=el('button',{class:'rbtn','aria-pressed':false,style:`--rc:var(${r.c})`,'data-k':k},`<span class="av" style="background:var(${r.c})">${r.init}</span>${r.label}`);b.onclick=()=>setRole(k);$('#roles').append(b)});
+function setRole(k){role=k;stopDay();const r=R[k],key=KEY[k];
+ $$('.rbtn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k==k));
+ document.querySelector('#v-role').style.setProperty('--rc',`var(${r.c})`);
+ $('#pAv').style.background=`var(${r.c})`;$('#pAv').textContent=r.init;$('#pName').textContent=r.label;$('#pSub').textContent=r.sub;$('#pDesc').textContent=r.desc;
+ const m=$('#menu');m.innerHTML='';MENU.forEach(([g,items])=>{m.append(el('div',{class:'grp'},g));items.forEach(([n,w])=>{const on=w.includes(key),was=prevKey&&w.includes(prevKey);const d=el('div',{class:'mi '+(on?'on':'off')+(on&&!was&&prevKey?' pop':'')},`<span>${n}</span>${on&&!was&&prevKey?'<small style="color:var(--accent)">NEW</small>':''}`);m.append(d)})});
+ prevKey=key;
+ const t=$('#tiles');t.innerHTML='';if(!r.tiles.length)t.innerHTML='<span style="color:var(--mute);font-size:14px">No dashboard. Visitors only see the public site.</span>';
+ r.tiles.forEach(([l,v])=>{const d=el('div',{class:'tile'},`<b>0</b><span>${l}</span>`);t.append(d);const b=d.querySelector('b');const t0=performance.now();(function f(n){const p=Math.min(1,(n-t0)/700);b.textContent=Math.round(v*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0)});
+ const fill=(sel,arr,mark)=>{const u=$(sel);u.innerHTML='';arr.forEach((x,i)=>{const li=el('li',{style:`animation-delay:${i*60}ms`},`<i>${mark}</i><span>${x}</span>`);u.append(li)})};
+ fill('#can',r.can,'✓');fill('#cannot',r.cannot,'✕');$('#aud').textContent=r.aud;
+ const s=$('#day');s.innerHTML='';r.day.forEach((x,i)=>{const st=el('div',{class:'step'},`<div class="dot">${i+1}</div><div>${x}</div>`);st.onclick=()=>{stopDay();goDay(i)};s.append(st)});goDay(0)}
+function goDay(i){dayCur=i;$$('#day .step').forEach((s,k)=>{s.classList.toggle('cur',k==i);s.classList.toggle('done',k<i)})}
+function stopDay(){clearInterval(dayTimer);dayTimer=null;const b=$('#dayPlay');if(b)b.textContent='Play'}
+$('#dayPlay').onclick=()=>{if(dayTimer)return stopDay();if(dayCur>=R[role].day.length-1)goDay(0);$('#dayPlay').textContent='Pause';dayTimer=setInterval(()=>{if(dayCur>=R[role].day.length-1)return stopDay();goDay(dayCur+1)},2200)};
+
+/* ---------- MATRIX ---------- */
+const Y='y',N='n';
+const MX=[
+ ['Read the public website and public notices',[Y,Y,Y,Y,Y,Y]],
+ ['Register an account',[Y,N,N,N,N,N]],
+ ['Get private notices in a personal feed',[N,Y,Y,Y,Y,[ 's','Sees every notice in the system']]],
+ ['Save notices and acknowledge them',[N,Y,Y,Y,Y,['s','Can save anything; acknowledges only when targeted']]],
+ ['Create a notice and use the AI draft',[N,N,Y,Y,Y,Y]],
+ ['Choose the audience',[N,N,['s','Students of their own department only'],['s','Their own department only: faculty, students, semester, class, people'],['s','Any audience, including the whole college'],['s','Any audience, including the whole college']]],
+ ['Publish directly, no approval',[N,N,N,Y,Y,Y]],
+ ['Submit a notice for HOD approval',[N,N,Y,N,N,N]],
+ ['Approve or reject teachers’ notices',[N,N,N,['s','Only notices from faculty of their own department'],N,N]],
+ ['Public notice on the website',[N,N,['s','Own wing only, and the HOD must approve it'],['s','Own wing only (Engineering or Polytechnic)'],['s','Engineering, Polytechnic or both'],['s','Engineering, Polytechnic or both']]],
+ ['Approve account requests',[N,N,['s','Only students of the class they are class teacher of'],['s','Faculty and students of their own department'],['s','Everyone, including HODs'],['s','Everyone; the main approver only if no Principal exists']]],
+ ['Assign class teachers',[N,N,N,Y,Y,Y]],
+ ['See read and acknowledge statistics',[N,N,['s','Their own notices'],['s','Their own and their department’s faculty notices'],['s','Their own notices'],['s','All notices']]],
+ ['Edit or delete notices',[N,N,['s','Only their own drafts and rejected notices'],['s','Their own notices'],['s','Their own notices'],['s','Delete any notice']]],
+ ['Archive a published or expired notice',[N,N,['s','Their own'],['s','Their own'],['s','Their own'],['s','Any notice']]],
+ ['Manage users, departments, categories',[N,N,N,N,N,Y]],
+ ['View all notices and the audit log',[N,N,N,N,N,Y]]
+];
+const mx=$('#mx');let hl=-1;
+function drawMx(){mx.innerHTML='<thead><tr><th>Action</th>'+ORDER.map((k,i)=>`<th data-i="${i}" class="${hl==i?'hl':''}" style="color:var(${R[k].c})">${R[k].label}</th>`).join('')+'</tr></thead>';
+ const tb=el('tbody');MX.forEach(([a,cells])=>{const tr=el('tr',{},`<td>${a}</td>`);cells.forEach((c,i)=>{const td=el('td',{class:hl==i?'hl':''});let t,cl,note='';if(c===Y){t='✓';cl='c-y'}else if(c===N){t='✕';cl='c-n'}else{t='◐';cl='c-s';note=c[1]}
+  const s=el('span',{class:'cell '+cl,role:note?'button':'img','aria-label':(c===Y?'Yes':c===N?'No':'Limited: '+note),tabindex:note?0:-1},t);
+  if(note){const f=()=>{$('#mxNote').innerHTML=`<b style="color:var(${R[ORDER[i]].c})">${R[ORDER[i]].label}</b> · ${a}<br><span style="color:var(--ink)">${note}</span>`;$('#mxNote').animate([{background:'var(--note1)'},{background:'var(--panel)'}],600)};s.onclick=f;s.onkeydown=e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();f()}}}
+  td.append(s);tr.append(td)});tb.append(tr)});mx.append(tb);
+ $$('#mx th[data-i]').forEach(th=>th.onclick=()=>{hl=hl==+th.dataset.i?-1:+th.dataset.i;drawMx()})}
+drawMx();
+
+/* ---------- STORY ---------- */
+const stage=$('#stage');const AV={};
+ORDER.forEach(k=>{const r=R[k];const a=el('div',{class:'actor'},`<div class="av" style="background:var(${r.c})">${r.init}</div>${r.label}`);stage.append(a);AV[k]=a});
+const S=[
+ [['VISITOR'],null,'A visitor browses the public site','No account needed. The page calls GET /api/public/notices, which is open in SecurityConfig and only returns notices that are public and live.'],
+ [['VISITOR'],['FACULTY'],'The visitor registers as a student','Chooses CS, semester 6, class A. RegistrationService finds the route: class teacher of that class, so Ms. Shah (Teacher) gets the request. The account is PENDING.'],
+ [['FACULTY'],['STUDENT'],'The class teacher approves','Account becomes APPROVED. Now login returns a JWT and the Student role gets the personal feed.'],
+ [['FACULTY'],['HOD'],'The teacher writes a notice and submits it','AI drafts the text, TargetPolicy allows “students of CS sem 6 A”. Teachers cannot publish, so status is PENDING_APPROVAL and the HOD is notified.'],
+ [['HOD'],['FACULTY'],'The HOD approves','NoticeService.approve checks canReview. Status moves APPROVED then PUBLISHED. The audit log records who approved and when.'],
+ [['HOD'],['STUDENT'],'Students are notified','NotificationService matches the notice targets and creates an in-app notification for each matching student. Email only for important or urgent notices.'],
+ [['STUDENT'],['FACULTY'],'The student reads and acknowledges','The notice is marked read. Acknowledge is counted. The teacher’s dashboard shows who has read it.'],
+ [['PRINCIPAL'],['STUDENT','FACULTY','HOD'],'The Principal broadcasts an urgent notice','Target: whole college. The Principal publishes directly with no approval. Urgent priority also sends email, and a red banner shows on dashboards.'],
+ [['PRINCIPAL'],['VISITOR'],'A public admission notice goes on the website','Visibility PUBLIC with wing Engineering. Visitors can now read it without signing in until it expires.'],
+ [['SUPER_ADMIN'],null,'The admin audits everything','Reads the audit log (registrations, approvals, publishes, expiry by the scheduler), suspends a user, edits categories and departments.']
+];
+let si=0,stTimer=null;
+const cap=$('#cap');
+function center(n){const sr=stage.getBoundingClientRect(),r=n.querySelector('.av').getBoundingClientRect();return[r.left-sr.left+r.width/2,r.top-sr.top+r.height/2]}
+function story(i){si=Math.max(0,Math.min(S.length-1,i));const [fr,to,t,d]=S[si];
+ Object.values(AV).forEach(a=>a.classList.remove('on'));fr.forEach(k=>AV[k].classList.add('on'));
+ stage.querySelectorAll('.env').forEach(e=>e.remove());
+ if(to){const [x0,y0]=center(AV[fr[0]]);to.forEach((k,j)=>{const e=el('div',{class:'env'},'✉');e.style.left=(x0-13)+'px';e.style.top=(y0-10)+'px';stage.append(e);const [x1,y1]=center(AV[k]);setTimeout(()=>{e.style.left=(x1-13)+'px';e.style.top=(y1-10+(j%2?10:-8))+'px'},60+j*120);setTimeout(()=>AV[k].classList.add('on'),950+j*120)})}
+ cap.style.setProperty('--rc',`var(${R[fr[0]].c})`);cap.innerHTML=`<h3>${si+1}. ${t}</h3><p style="margin:0">${d}</p>`;$('#sprog').style.width=((si+1)/S.length*100)+'%'}
+function stopStory(){clearInterval(stTimer);stTimer=null;const b=$('#sPlay');if(b)b.textContent='Play story'}
+$('#sPlay').onclick=()=>{if(stTimer)return stopStory();if(si>=S.length-1)story(0);$('#sPlay').textContent='Pause';stTimer=setInterval(()=>{if(si>=S.length-1)return stopStory();story(si+1)},4200)};
+$('#sNext').onclick=()=>{stopStory();story(si+1)};$('#sPrev').onclick=()=>{stopStory();story(si-1)};$('#sRestart').onclick=()=>{stopStory();story(0)};
+
+/* ---------- TESTER ---------- */
+const WHO=ORDER;
+WHO.forEach(k=>$('#tWho').append(el('option',{value:k},R[k].label+(k=='VISITOR'?' (no token)':''))));$('#tWho').value='STUDENT';
+const ALL=['STUDENT','FACULTY','HOD','PRINCIPAL','SUPER_ADMIN'],CRE=['FACULTY','HOD','PRINCIPAL','SUPER_ADMIN'];
+const API=[
+ ['GET /api/public/notices','open',null,'Open to everyone'],
+ ['POST /api/auth/login','open',null,'Open to everyone'],
+ ['GET /api/notices (my feed)','auth',ALL,'Any signed-in member'],
+ ['GET /api/dashboard/student','pre',['STUDENT'],'hasRole(STUDENT)'],
+ ['GET /api/dashboard/hod','pre',['HOD'],'hasRole(HOD)'],
+ ['POST /api/notices (create)','pre',CRE,'hasAnyRole(SUPER_ADMIN, PRINCIPAL, HOD, FACULTY)'],
+ ['POST /api/ai/notice-draft','pre',CRE,'hasAnyRole(SUPER_ADMIN, PRINCIPAL, HOD, FACULTY)'],
+ ['POST /api/notices/42/submit','pre',['FACULTY'],'hasRole(FACULTY)'],
+ ['POST /api/notices/42/publish','pre',['HOD','PRINCIPAL','SUPER_ADMIN'],'hasAnyRole(SUPER_ADMIN, PRINCIPAL, HOD)'],
+ ['POST /api/notices/42/approve','pre',['HOD'],'hasRole(HOD), then the service also checks it is your department'],
+ ['GET /api/registrations/pending','pre',CRE,'hasAnyRole(SUPER_ADMIN, PRINCIPAL, HOD, FACULTY)'],
+ ['GET /api/class-teachers/options','pre',['HOD','PRINCIPAL','SUPER_ADMIN'],'hasAnyRole(SUPER_ADMIN, PRINCIPAL, HOD)'],
+ ['POST /api/departments','pre',['SUPER_ADMIN'],'hasRole(SUPER_ADMIN)'],
+ ['PUT /api/users/7/suspend','pre',['SUPER_ADMIN'],'hasRole(SUPER_ADMIN)'],
+ ['GET /api/audit-logs','url',['SUPER_ADMIN'],'SecurityConfig: hasRole(SUPER_ADMIN)']
+];
+API.forEach((a,i)=>$('#tApi').append(el('option',{value:i},a[0])));$('#tApi').value=3;
+$('#tGo').onclick=()=>{const who=$('#tWho').value,a=API[+$('#tApi').value];const g=$$('#gate .s');g.forEach(x=>x.className='s');const res=$('#tRes');res.innerHTML='';
+ const steps=[];const open=a[1]=='open';
+ const tokenOk=who!='VISITOR';
+ let out=null;
+ g[0].className='s on';
+ setTimeout(()=>{if(!open&&!tokenOk){g[0].className='s fail';out=[401,'401 Unauthorized: no token. The JSON entry point asks you to sign in.','var(--bad)'];return fin()}
+  g[0].className='s ok';g[1].className='s on';
+  setTimeout(()=>{if(a[1]=='url'&&!a[2].includes(who)){g[1].className='s fail';out=[403,'403 Forbidden by SecurityConfig: '+a[3],'var(--bad)'];return fin()}
+   g[1].className='s ok';g[2].className='s on';
+   setTimeout(()=>{if(a[1]=='pre'&&!a[2].includes(who)){g[2].className='s fail';out=[403,'403 Access Denied. Rule: '+a[3],'var(--bad)'];return fin()}
+    g[2].className='s ok';g[3].className='s on';
+    setTimeout(()=>{g[3].className='s ok';out=[200,'200 OK. '+(open?'Open endpoint.':'Allowed by: '+a[3]+'.'),'var(--green)'];fin()},450)},450)},450)},300);
+ function fin(){const d=el('div',{class:'res'},out[1]);d.style.background=out[2];res.append(d);if(out[0]!=200){res.classList.remove('shake');void res.offsetWidth;res.classList.add('shake')}}
+};
+
+/* init */
+setRole('STUDENT');story(0);
+const h=(location.hash||'#role').slice(1);show(TABS.some(t=>t[0]==h)?h:'role');
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>College Notice Board — UML Diagram Set</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6f8;--card:#fff;--tx:#0f1b2d;--mut:#5b6b7f;--bd:#dde3ea;--side:#ffffff;color-scheme:light;--ac:#0e9f94;--note:#e8f6f4}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif;display:flex;min-height:100vh}
+aside{width:260px;background:var(--side);border-right:1px solid var(--bd);color:#334155;padding:20px 14px;position:sticky;top:0;height:100vh;overflow:auto;flex:none}
+aside h1{font-size:18px;color:#0f1b2d;margin:0 0 4px}aside h1:before{content:"◆ ";color:var(--ac)}
+aside small{display:block;font:11px monospace;letter-spacing:.08em;color:#64748b;margin-bottom:16px}
+aside a{display:block;padding:8px 10px;border-radius:6px;color:#334155;text-decoration:none;font-size:14px;cursor:pointer}
+aside a:hover{background:#eef2f6}aside a.on{background:var(--ac);color:#fff}
+aside .nw{float:right;background:#f59e0b;color:#fff;font:9px monospace;padding:2px 6px;border-radius:3px}aside em{display:block;font:10px monospace;letter-spacing:.1em;color:#64748b;margin:14px 10px 4px;font-style:normal;text-transform:uppercase}
+main{flex:1;min-width:0;padding:32px 40px;max-width:1100px}
+.crumb{font:11px monospace;letter-spacing:.1em;color:var(--mut);text-transform:uppercase}
+h2{font-size:28px;margin:6px 0 8px}p.d{color:var(--mut);max-width:720px;margin:0 0 16px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+button{font:inherit;font-size:13px;padding:8px 14px;border-radius:6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+button.p{background:#0c1626;color:#fff;border-color:#0c1626}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;overflow-x:auto}
+.box svg{max-width:100%;height:auto}pre.src{display:none;margin:0;white-space:pre-wrap;font:12px/1.5 monospace}
+.note{margin-top:16px;padding:14px 18px;background:var(--note);border-left:3px solid var(--ac);border-radius:6px;font-size:14px}
+.note b{display:block;margin-bottom:4px}
+@media(max-width:800px){body{flex-direction:column}aside{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px}aside em,aside small{width:100%}main{padding:20px 16px}}
+</style></head><body>
+<aside id="nav"><h1>Notice Board</h1><small>SYSTEM DESIGN · UML SET</small></aside>
+<main><div class="crumb" id="crumb"></div><h2 id="title"></h2><p class="d" id="desc"></p>
+<div class="bar"><button class="p" id="bCode">View Mermaid Code</button><button id="bSvg">Download SVG</button><button id="bCopy">Copy Code</button></div>
+<div class="box"><div id="out"></div><pre class="src" id="src"></pre></div>
+<div class="note" id="note"></div></main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+const D=[
+{g:"Class Diagram",t:"Class Diagram",d:"Domain classes of the Spring Boot backend (JPA entities) with enums and key associations.",n:"Notice owns NoticeTarget (cascade, orphanRemoval). User, Department and NoticeCategory are referenced via @ManyToOne.",c:`classDiagram
+class User{+Long id +String fullName +String email +Role role +AccountStatus status +Integer semester +String className}
+class Department{+Long id +String name +String code +InstitutionType institutionType +Integer semesterCount}
+class Notice{+Long id +String title +Priority priority +NoticeStatus status +NoticeVisibility visibility +LocalDateTime publishDate +LocalDateTime expiryDate +boolean acknowledgementRequired +boolean aiGenerated}
+class NoticeTarget{+TargetType targetType +Role targetRole +Integer semester +String className}
+class NoticeCategory{+String name +boolean active}
+class Attachment{+String originalFileName +String cloudinaryUrl +Long fileSize}
+class Notification{+String message +boolean isRead}
+class NoticeRead{+LocalDateTime readAt}
+class NoticeAcknowledgement{+LocalDateTime acknowledgedAt}
+class SavedNotice{+LocalDateTime savedAt}
+class ClassTeacher{+Integer semester +String className}
+class AuditLog{+AuditAction action +String entityType +Long entityId}
+Notice "1" *-- "*" NoticeTarget
+Notice "*" --> "1" NoticeCategory
+Notice "*" --> "1" User : createdBy
+Notice "*" --> "0..1" Department
+Notice "1" o-- "*" Attachment
+User "*" --> "0..1" Department
+NoticeTarget "*" --> "0..1" Department
+NoticeTarget "*" --> "0..1" User
+Notification "*" --> "1" User
+Notification "*" --> "0..1" Notice
+NoticeRead "*" --> "1" Notice
+NoticeRead "*" --> "1" User
+NoticeAcknowledgement "*" --> "1" Notice
+NoticeAcknowledgement "*" --> "1" User
+SavedNotice "*" --> "1" Notice
+SavedNotice "*" --> "1" User
+ClassTeacher "*" --> "1" Department
+ClassTeacher "*" --> "1" User : teacher`},
+{g:"Entity Relationship",t:"ER Diagram",d:"Relational schema with primary/foreign keys and cardinalities as mapped by JPA.",n:"Roles: SUPER_ADMIN, PRINCIPAL, HOD, FACULTY, STUDENT. Notice status: DRAFT → PENDING_APPROVAL → APPROVED/REJECTED → SCHEDULED/PUBLISHED → EXPIRED/ARCHIVED.",c:`erDiagram
+DEPARTMENT{bigint id PK string name string code string institutionType int semesterCount}
+USER{bigint id PK string email UK string role string status bigint department_id FK int semester string className}
+NOTICE_CATEGORY{bigint id PK string name boolean active}
+NOTICE{bigint id PK string title string priority string status string visibility bigint category_id FK bigint created_by FK bigint department_id FK bigint reviewed_by FK datetime publishDate datetime expiryDate}
+NOTICE_TARGET{bigint id PK bigint notice_id FK string targetType string targetRole bigint department_id FK bigint user_id FK}
+ATTACHMENT{bigint id PK bigint notice_id FK bigint uploaded_by FK string cloudinaryUrl}
+NOTIFICATION{bigint id PK bigint user_id FK bigint notice_id FK boolean isRead}
+NOTICE_READ{bigint id PK bigint notice_id FK bigint user_id FK}
+NOTICE_ACKNOWLEDGEMENT{bigint id PK bigint notice_id FK bigint user_id FK}
+SAVED_NOTICE{bigint id PK bigint notice_id FK bigint user_id FK}
+CLASS_TEACHER{bigint id PK bigint department_id FK bigint teacher_id FK int semester string className}
+AUDIT_LOG{bigint id PK bigint userId string action string entityType bigint entityId}
+DEPARTMENT ||--o{ USER : has
+DEPARTMENT ||--o{ NOTICE : scopes
+DEPARTMENT ||--o{ CLASS_TEACHER : has
+USER ||--o{ NOTICE : creates
+USER ||--o{ CLASS_TEACHER : teaches
+USER ||--o{ NOTIFICATION : receives
+USER ||--o{ NOTICE_READ : reads
+USER ||--o{ NOTICE_ACKNOWLEDGEMENT : acknowledges
+USER ||--o{ SAVED_NOTICE : saves
+NOTICE_CATEGORY ||--o{ NOTICE : classifies
+NOTICE ||--o{ NOTICE_TARGET : targets
+NOTICE ||--o{ ATTACHMENT : has
+NOTICE ||--o{ NOTIFICATION : triggers
+NOTICE ||--o{ NOTICE_READ : tracked
+NOTICE ||--o{ NOTICE_ACKNOWLEDGEMENT : tracked
+NOTICE ||--o{ SAVED_NOTICE : bookmarked`},
+{g:"Component Diagram",t:"Component Diagram",d:"React SPA, Spring Boot layers and external services.",n:"Frontend talks REST (/api/*) with a JWT Bearer token; AI drafting uses the Anthropic client (with a mock fallback).",c:`flowchart LR
+subgraph FE[React + Vite SPA]
+P[Pages] --> CMP[Components] --> API[services/api.js]
+end
+subgraph BE[Spring Boot Backend]
+SEC[JwtAuthenticationFilter / SecurityConfig] --> CTL[Controllers]
+CTL --> SVC[Services: Notice, Auth, Registration, Notification, TargetMatcher]
+SVC --> REPO[JPA Repositories]
+SVC --> SCH[NoticeScheduler]
+end
+API -- REST + JWT --> SEC
+REPO --> DB[(Relational DB)]
+SVC --> CLD[Cloudinary]
+SVC --> MAIL[Email Service]
+SVC --> AI[Anthropic AI Client]`},
+{g:"Deployment Diagram",t:"Deployment Diagram",d:"Runtime nodes and how artifacts are deployed.",n:"Backend ships with a Dockerfile (.dockerignore present); frontend is a static Vite build.",c:`flowchart TB
+U[User Browser] -->|HTTPS| FEH[Static Host: React build]
+U -->|HTTPS REST| BEH
+subgraph BEH[Docker Container: Spring Boot JAR]
+APP[noticeboard.jar]
+end
+BEH -->|JDBC| DB[(Database Server)]
+BEH -->|HTTPS| CL[Cloudinary CDN]
+BEH -->|SMTP| SM[Mail Server]
+BEH -->|HTTPS| AN[Anthropic API]`},
+{g:"Package Diagram",t:"Package Diagram",d:"Backend package layout under com.college.noticeboard.",n:"Dependencies flow top-down: controller → service → repository → entity.",c:`flowchart TB
+controller --> service
+controller --> dto
+service --> repository
+service --> dto
+service --> entity
+repository --> entity
+service --> config
+config --> entity
+controller --> exception
+service --> exception`},
+{g:"Use Case Diagram",t:"Use Case Diagram",d:"What each actor can do in the system.",n:"Public visitors only see notices with visibility = PUBLIC.",c:`flowchart LR
+V((Visitor)):::a
+S((Student)):::a
+F((Faculty)):::a
+H((HOD)):::a
+PR((Principal)):::a
+A((Super Admin)):::a
+subgraph System[College Notice Board]
+u1([View public notices])
+u2([Register / Login])
+u3([View targeted notices])
+u4([Acknowledge, save, mark read])
+u5([Create and submit notice])
+u6([Upload attachments])
+u7([AI draft notice])
+u8([Approve / reject notice])
+u9([Approve account requests])
+u10([Manage users, departments, categories])
+u11([Assign class teachers])
+u12([View audit logs])
+end
+V-->u1 & u2
+S-->u3 & u4
+F-->u3 & u5 & u6 & u7
+H-->u5 & u8 & u9 & u11
+PR-->u8 & u9
+A-->u10 & u12 & u9
+classDef a fill:#0e9f94,color:#fff,stroke:none`},
+{g:"Sequence Diagram",t:"Notice Approval",d:"Faculty creates a notice, HOD approves, scheduler publishes and notifies recipients.",n:"Maps to POST /api/notices/{id}/submit, /approve, and NoticeScheduler.",c:`sequenceDiagram
+actor F as Faculty
+participant UI as React UI
+participant NC as NoticeController
+participant NS as NoticeService
+participant DB as Database
+actor H as HOD
+F->>UI: Fill notice form + targets
+UI->>NC: POST /api/notices
+NC->>NS: create(dto)
+NS->>DB: save Notice (DRAFT) + audit
+F->>NC: POST /{id}/submit
+NS->>DB: status = PENDING_APPROVAL
+NS-->>H: Notification
+H->>NC: POST /{id}/approve
+NS->>DB: status = APPROVED, reviewedBy
+alt publishDate in future
+NS->>DB: status = SCHEDULED
+else publish now
+NS->>DB: status = PUBLISHED
+NS->>DB: create Notifications (TargetMatcher recipients)
+end
+NC-->>UI: 200 NoticeResponse`},
+{g:"Sequence Diagram",t:"Registration & Login",d:"Account request, admin approval, then JWT login.",n:"Logins are blocked unless AccountStatus = APPROVED; AuthRateLimiter throttles attempts.",c:`sequenceDiagram
+actor U as User
+participant AC as AuthController
+participant AS as AuthService
+participant DB as Database
+actor AD as Approver
+U->>AC: POST /api/auth/register
+AS->>DB: save User (PENDING)
+AD->>AC: approve request
+AS->>DB: status = APPROVED
+U->>AC: POST /api/auth/login
+AS->>AS: rate limit + check password
+alt status APPROVED
+AS-->>U: JWT token + profile
+else not approved
+AS-->>U: 403 AccountStatusException
+end`},
+{g:"Activity Diagram",t:"Activity Diagram",d:"Workflow from drafting a notice to expiry.",n:"Rejected notices return to the author with a rejectionReason.",c:`flowchart TD
+s((Start)) --> a[Create notice and choose targets]
+a --> b{Use AI draft?}
+b -->|Yes| c[Generate with AI, edit] --> d
+b -->|No| d[Attach files]
+d --> e[Submit for approval]
+e --> f{Reviewer decision}
+f -->|Reject| g[Add reason, back to author] --> a
+f -->|Approve| h{Publish date in future?}
+h -->|Yes| i[Scheduled] --> j[Scheduler publishes]
+h -->|No| j[Publish now]
+j --> k[Notify recipients]
+k --> l[Users read / acknowledge]
+l --> m{Expired?}
+m -->|Yes| n[Expire / archive] --> z((End))
+m -->|No| l`},
+{g:"State Diagram",t:"Notice Lifecycle",d:"Lifecycle of Notice.status.",n:"Values come from the NoticeStatus enum.",c:`stateDiagram-v2
+[*] --> DRAFT
+DRAFT --> PENDING_APPROVAL: submit
+PENDING_APPROVAL --> APPROVED: approve
+PENDING_APPROVAL --> REJECTED: reject
+REJECTED --> DRAFT: edit
+APPROVED --> SCHEDULED: future publishDate
+APPROVED --> PUBLISHED: publish now
+SCHEDULED --> PUBLISHED: scheduler
+PUBLISHED --> EXPIRED: expiryDate reached
+PUBLISHED --> ARCHIVED: archive
+EXPIRED --> ARCHIVED
+ARCHIVED --> [*]`},
+{g:"State Diagram",t:"Account Status",d:"Lifecycle of User.status.",n:"Values come from the AccountStatus enum.",c:`stateDiagram-v2
+[*] --> PENDING: register
+PENDING --> APPROVED: approve
+PENDING --> REJECTED: reject
+APPROVED --> SUSPENDED: suspend
+SUSPENDED --> APPROVED: reactivate
+APPROVED --> DEACTIVATED: deactivate
+DEACTIVATED --> APPROVED: activate`}
+,{g:"Sequence Diagram",nw:1,t:"Upload Attachment",d:"Uploading a notice file with validation and Cloudinary storage.",n:"FileValidator checks type and size before CloudStorageService uploads.",c:`sequenceDiagram
+actor F as Faculty
+participant AC as AttachmentController
+participant FV as FileValidator
+participant CS as CloudinaryService
+participant DB as Database
+F->>AC: POST attachment (multipart)
+AC->>FV: validate(file)
+alt invalid
+FV-->>F: 400 Bad Request
+else valid
+AC->>CS: upload(file)
+CS-->>AC: publicId + url
+AC->>DB: save Attachment + audit
+AC-->>F: AttachmentResponse
+end`},
+{g:"Sequence Diagram",nw:1,t:"AI Draft Notice",d:"Generating a notice draft from a short prompt.",n:"Falls back to MockAiSuggestionClient when no API key is configured.",c:`sequenceDiagram
+actor F as Faculty
+participant AC as AiController
+participant AN as AiNoticeService
+participant CL as AiSuggestionClient
+participant DB as Database
+F->>AC: POST prompt
+AC->>AN: generateDraft(prompt)
+AN->>CL: suggest(prompt)
+CL-->>AN: title + description
+AN->>DB: save Notice (DRAFT, aiGenerated=true)
+AN->>DB: audit AI_DRAFT_CREATED
+AC-->>F: Draft for editing`},
+{g:"Data Flow Diagram",t:"DFD — Level 0 (Context)",d:"The whole system as one process with external entities.",n:"Level 0 shows only data crossing the system boundary.",c:`flowchart LR
+A[Admin / Principal / HOD] -->|approvals, users, config| P((0 College Notice Board System))
+F[Faculty] -->|notice drafts, files| P
+S[Student] -->|registration, read / acknowledge| P
+V[Visitor] -->|public notice requests| P
+P -->|notices, notifications| S
+P -->|approval requests, reports| A
+P -->|status, feedback| F
+P -->|public notices| V
+P <-->|files| C[Cloudinary]
+P -->|emails| M[Mail Server]`},
+{g:"Data Flow Diagram",t:"DFD — Level 1",d:"Main processes and data stores.",n:"D1–D4 are database tables behind the repositories.",c:`flowchart TB
+U[Users] -->|credentials| P1((1.0 Authentication))
+P1 <--> D1[(D1 Users)]
+F[Faculty] -->|notice data| P2((2.0 Notice Management))
+P2 <--> D2[(D2 Notices + Targets)]
+P2 -->|for review| P3((3.0 Approval))
+H[HOD / Principal] -->|decision| P3
+P3 --> D2
+D2 --> P4((4.0 Publish + Notify))
+D1 --> P4
+P4 --> D3[(D3 Notifications)]
+D3 --> S[Students] 
+S -->|read / ack| P5((5.0 Tracking))
+P5 --> D4[(D4 Reads + Acks)]
+P2 --> D5[(D5 Audit Log)]`},
+{g:"Data Flow Diagram",t:"DFD — Level 2 (Notices)",d:"Process 2.0 Notice Management broken down.",n:"Targets are resolved later by TargetMatcher to find recipients.",c:`flowchart LR
+F[Faculty] -->|form data| P21((2.1 Validate Input))
+P21 -->|valid notice| P22((2.2 Set Targets))
+P22 --> P23((2.3 Attach Files))
+P23 <--> CL[Cloudinary]
+P23 --> P24((2.4 Save Draft))
+P24 --> D2[(Notices)]
+P24 --> D5[(Audit Log)]
+P24 --> P25((2.5 Submit for Approval))
+P25 -->|status PENDING_APPROVAL| D2`}
+,{g:"State Diagram",nw:1,t:"Notification Status",d:"Lifecycle of a Notification record.",n:"Driven by NotificationService and the isRead flag.",c:`stateDiagram-v2
+[*] --> UNREAD: notice published
+UNREAD --> READ: user opens
+READ --> [*]`}
+
+];
+const ORDER=['Entity Relationship','Class Diagram','Use Case Diagram','Sequence Diagram','Activity Diagram','Data Flow Diagram','State Diagram','Component Diagram','Deployment Diagram','Package Diagram'];D.sort((a,b)=>ORDER.indexOf(a.g)-ORDER.indexOf(b.g));const nav=document.getElementById('nav');let cur=0,showCode=false,lastG='';
+D.forEach((x,i)=>{if(x.g!==lastG){lastG=x.g;nav.insertAdjacentHTML('beforeend','<em>'+x.g+'</em>')}
+const a=document.createElement('a');a.innerHTML=String(i+1).padStart(2,'0')+'&nbsp; '+x.t+(x.nw?' <b class="nw">NEW</b>':'');a.onclick=()=>show(i);nav.appendChild(a)});
+mermaid.initialize({startOnLoad:false,theme:'default',securityLevel:'loose'});
+async function show(i){cur=i;const x=D[i];
+document.querySelectorAll('aside a').forEach((a,k)=>a.classList.toggle('on',k===i));
+crumb.textContent=x.g;title.textContent=x.t;desc.textContent=x.d;
+note.innerHTML='<b>Notes</b>'+x.n;src.textContent=x.c;
+try{const r=await mermaid.render('m'+i+Date.now(),x.c);out.innerHTML=r.svg}catch(e){out.textContent='Render error: '+e.message}
+out.style.display=showCode?'none':'block';src.style.display=showCode?'block':'none'}
+bCode.onclick=()=>{showCode=!showCode;bCode.textContent=showCode?'View Diagram':'View Mermaid Code';out.style.display=showCode?'none':'block';src.style.display=showCode?'block':'none'};
+bCopy.onclick=()=>{try{navigator.clipboard.writeText(D[cur].c);bCopy.textContent='Copied!';setTimeout(()=>bCopy.textContent='Copy Code',1200)}catch(e){}};
+bSvg.onclick=()=>{const s=out.querySelector('svg');if(!s)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s.outerHTML],{type:'image/svg+xml'}));a.download=D[cur].t.replace(/\W+/g,'_')+'.svg';a.click()};
+show(0);
+</script></body></html>

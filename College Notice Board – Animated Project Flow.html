@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>College Notice Board – How It Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef3f6;--panel:#ffffff;--ink:#14232c;--mute:#56707e;--line:#cfdbe2;
+  --accent:#0b7a75;--accent2:#d4472f;--gold:#e8a91d;--blue:#2d6cdf;--green:#2a9d58;--violet:#7a4fd0;
+  --note1:#fff2a8;--note2:#ffd3dc;--note3:#cfe8ff;--chalk:#10222b;
+  --ok:#2a9d58;--bad:#d4472f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0e1d25;--panel:#15303c;--ink:#e9f1f4;--mute:#93b0bd;--line:#2a4a58;--accent:#35c4bb;--accent2:#ff7a63;--gold:#f2bf47;--blue:#6a9bff;--green:#4cc982;--violet:#a88af0;--chalk:#0a161c;--note1:#6b5f1c;--note2:#6b2f3d;--note3:#244b6b}
+}
+:root[data-theme="dark"]{--bg:#0e1d25;--panel:#15303c;--ink:#e9f1f4;--mute:#93b0bd;--line:#2a4a58;--accent:#35c4bb;--accent2:#ff7a63;--gold:#f2bf47;--blue:#6a9bff;--green:#4cc982;--violet:#a88af0;--chalk:#0a161c;--note1:#6b5f1c;--note2:#6b2f3d;--note3:#244b6b}
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Atkinson Hyperlegible',system-ui,sans-serif;line-height:1.55;font-size:16px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;margin:0;line-height:1.1}
+header.hero{background:var(--chalk);color:#e9f1f4;padding:44px 20px 36px;position:relative;overflow:hidden}
+header.hero .wrap{max-width:1040px;margin:auto;position:relative}
+header.hero h1{font-size:clamp(30px,6vw,56px);font-weight:800;letter-spacing:-.02em;max-width:14ch}
+header.hero p{max-width:56ch;color:#a9c3cf;margin:14px 0 0;font-size:18px}
+.pins{position:absolute;right:0;top:-6px;width:340px;height:200px;pointer-events:none}
+.note{position:absolute;width:132px;padding:14px 12px;color:#1c1c1c;font-size:13px;box-shadow:2px 6px 14px rgba(0,0,0,.35);transform-origin:50% 8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:700}
+.note::before{content:"";position:absolute;left:50%;top:-6px;width:12px;height:12px;border-radius:50%;background:#d4472f;transform:translateX(-50%);box-shadow:0 2px 3px rgba(0,0,0,.4)}
+.n1{background:#fff2a8;left:10px;top:14px;animation:sway 5s ease-in-out infinite}
+.n2{background:#ffd3dc;left:120px;top:60px;animation:sway 6s ease-in-out -2s infinite}
+.n3{background:#cfe8ff;left:216px;top:6px;animation:sway 5.5s ease-in-out -1s infinite}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(3deg)}}
+@media (max-width:760px){.pins{display:none}}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;padding:0 10px}
+nav.tabs button{background:none;border:0;color:var(--mute);font:700 14px 'Atkinson Hyperlegible',sans-serif;padding:15px 14px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+main{max-width:1040px;margin:auto;padding:28px 18px 80px}
+section.view{display:none}
+section.view.on{display:block}
+.lead{color:var(--mute);max-width:70ch;margin:8px 0 22px}
+h2{font-size:clamp(24px,4vw,34px);font-weight:800}
+h3{font-size:19px;margin-bottom:8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+.btn{font:700 14px 'Atkinson Hyperlegible',sans-serif;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:9px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sel{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+label.f{font-size:13px;color:var(--mute);display:flex;flex-direction:column;gap:3px}
+select,input[type=range]{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:8px}
+input[type=range]{padding:0;width:100%}
+svg text{font-family:'Atkinson Hyperlegible',sans-serif}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px;word-break:break-all}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12.5px;font-weight:700;background:var(--bg);border:1px solid var(--line)}
+.log{background:var(--chalk);color:#d6e6ec;border-radius:12px;padding:14px;min-height:150px;font-size:14px;max-height:280px;overflow:auto}
+.log div{padding:3px 0;animation:slidein .35s ease both}
+.log .err{color:#ff8f7d}.log .okk{color:#7fe0a8}.log .sys{color:#f2bf47}
+@keyframes slidein{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+/* architecture */
+.node rect{fill:var(--panel);stroke:var(--line);stroke-width:2;transition:.2s}
+.node{cursor:pointer}
+.node:hover rect,.node.act rect{stroke:var(--accent);stroke-width:3}
+.node text.t{font-weight:700;font-size:14px;fill:var(--ink)}
+.node text.s{font-size:11.5px;fill:var(--mute)}
+.wire{stroke:var(--line);stroke-width:2;fill:none;stroke-dasharray:5 5;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-20}}
+/* targeting */
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.person{border:1.5px solid var(--line);border-radius:10px;padding:8px;font-size:12px;background:var(--panel);transition:transform .3s,background .3s,border-color .3s,opacity .3s;opacity:.55}
+.person b{display:block;font-size:13px}
+.person.hit{opacity:1;background:var(--note1);border-color:var(--gold);transform:translateY(-4px) rotate(-1.5deg);color:#1c1c1c;box-shadow:0 5px 12px rgba(0,0,0,.18)}
+.chip{display:inline-flex;gap:6px;align-items:center;background:var(--note3);color:#10222b;border-radius:99px;padding:4px 6px 4px 12px;font-size:13px;font-weight:700}
+.chip button{border:0;background:rgba(0,0,0,.15);border-radius:50%;width:20px;height:20px;cursor:pointer;color:inherit}
+.count{font:800 44px 'Bricolage Grotesque';color:var(--accent)}
+/* stepper */
+.steps{display:flex;flex-direction:column;gap:0;position:relative}
+.step{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:10px 0;opacity:.45;transition:opacity .3s;cursor:pointer}
+.step.done{opacity:.8}.step.cur{opacity:1}
+.dot{width:30px;height:30px;border-radius:50%;background:var(--line);color:var(--ink);display:grid;place-items:center;font-weight:800;font-size:13px;transition:.3s;position:relative;z-index:1}
+.step.done .dot{background:var(--green);color:#fff}
+.step.cur .dot{background:var(--accent);color:#fff;transform:scale(1.2);box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 25%,transparent)}
+.step .body{max-height:0;overflow:hidden;transition:max-height .4s}
+.step.cur .body{max-height:240px}
+.step .ttl{font-weight:700}
+.rail{position:absolute;left:14px;top:20px;bottom:20px;width:3px;background:var(--line)}
+.rail i{display:block;width:100%;background:var(--green);height:0;transition:height .5s}
+/* chain */
+.chain{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:14px 0}
+.link{padding:10px 14px;border-radius:10px;border:2px solid var(--line);background:var(--panel);font-weight:700;font-size:14px;transition:.4s;opacity:.5}
+.link.on{opacity:1;border-color:var(--accent);background:var(--note3);color:#10222b;animation:pop .5s}
+.link.skip{text-decoration:line-through;opacity:.35}
+.arrow{color:var(--mute);font-size:20px}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.tl{position:relative;height:60px;background:var(--bg);border-radius:10px;border:1px solid var(--line);overflow:hidden}
+.tl .seg{position:absolute;top:0;bottom:0;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
+.tl .now{position:absolute;top:-2px;bottom:-2px;width:3px;background:var(--accent2);transition:left .15s}
+.tag{padding:6px 12px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block}
+.files{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.files .card h3{font-size:16px}.files ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--mute)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.theme{position:absolute;right:0;bottom:0}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <h1>How the College Notice Board works</h1>
+  <p>Spring Boot + React + MySQL. Tap through the tabs: every diagram is live, so you can click, switch roles and watch notices move.</p>
+  <div class="pins" aria-hidden="true"><div class="note n1">Fee deadline<br>Friday</div><div class="note n2">Sem 6 exam<br>timetable</div><div class="note n3">Holiday<br>notice</div></div>
+</div></header>
+
+<nav class="tabs" role="tablist" id="tabs"></nav>
+
+<main>
+<!-- 1 ARCHITECTURE -->
+<section class="view" id="v-arch">
+  <h2>1. The big picture</h2>
+  <p class="lead">A browser talks to one Spring Boot API. Every request passes the security layer, then a controller, then a service, then MySQL. Click any box to see what lives there. Packets show requests going right and responses coming back.</p>
+  <div class="card" style="padding:8px">
+  <svg viewBox="0 0 980 430" width="100%" id="archsvg" role="img" aria-label="Architecture diagram">
+    <defs>
+      <path id="reqp" d="M170 185 H820"/><path id="resp" d="M820 225 H170"/>
+      <path id="p-cloud" d="M565 245 V335"/><path id="p-mail" d="M690 245 V335"/><path id="p-ai" d="M440 245 V335 "/><path id="p-sch" d="M690 75 V135"/>
+      <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+    </defs>
+    <path class="wire" d="M170 185 H820"/><path class="wire" d="M820 225 H170"/>
+    <path class="wire" d="M565 245 V335"/><path class="wire" d="M690 245 V335"/><path class="wire" d="M440 245 V335"/><path class="wire" d="M690 75 V135"/>
+    <g id="nodes"></g>
+    <g id="packets"></g>
+  </svg></div>
+  <div class="card" style="margin-top:14px" id="archinfo"></div>
+  <h3 style="margin-top:28px">Where the code lives</h3>
+  <div class="files">
+    <div class="card"><h3 style="color:var(--blue)">frontend/src</h3><ul><li><b>App.jsx</b>: all routes, role guards</li><li><b>context/AuthContext</b>: token + current user</li><li><b>services/api.js</b>: every API call</li><li><b>pages/</b>: Dashboard, NoticeForm, NoticeList…</li><li><b>pages/public/</b>: Landing, Admissions…</li></ul></div>
+    <div class="card"><h3 style="color:var(--green)">backend/config</h3><ul><li><b>SecurityConfig</b>: which URLs are open</li><li><b>JwtAuthenticationFilter</b>: reads token</li><li><b>JwtService</b>: makes/validates JWT</li><li><b>DataSeeder</b>: demo users on 1st start</li></ul></div>
+    <div class="card"><h3 style="color:var(--violet)">backend/controller + service</h3><ul><li><b>NoticeController → NoticeService</b></li><li><b>TargetPolicy / TargetMatcher</b>: who gets it</li><li><b>NoticeScheduler</b>: runs every 60 s</li><li><b>Notification / Email / Audit services</b></li></ul></div>
+    <div class="card"><h3 style="color:var(--accent2)">backend/entity</h3><ul><li><b>User, Notice, NoticeTarget</b></li><li><b>Department, NoticeCategory</b></li><li><b>NoticeRead, Acknowledgement, SavedNotice</b></li><li><b>Notification, AuditLog, Attachment</b></li></ul></div>
+  </div>
+</section>
+
+<!-- 2 ACCOUNTS -->
+<section class="view" id="v-acc">
+  <h2>2. Registration and approval</h2>
+  <p class="lead">Nobody picks their own approver. <span class="code">RegistrationService</span> routes the request up the chain automatically. Choose who is applying and flip the switches to see where the request lands.</p>
+  <div class="card">
+    <div class="row" id="applicant"></div>
+    <div class="row" style="margin-top:10px">
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="hasCT" checked> Class teacher assigned</label>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="hasHod" checked> Department has an HOD</label>
+    </div>
+    <div class="chain" id="chain"></div>
+    <div id="routeText" style="font-weight:700"></div>
+    <div class="row" style="margin-top:14px"><button class="btn pri" id="approveBtn">Approver clicks Approve</button><button class="btn" id="rejectBtn">Reject (with reason)</button><button class="btn" id="resetReg">Reset</button></div>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card"><h3>Account status</h3><div class="row" id="statusrow"></div><p style="color:var(--mute);font-size:14px" id="statusnote"></p></div>
+    <div class="card"><h3>Try to sign in</h3><div class="row"><button class="btn" data-pw="bad">Wrong password</button><button class="btn pri" data-pw="good">Correct password</button></div><div class="log" id="loginlog" style="min-height:90px;margin-top:10px"></div></div>
+  </div>
+  <p class="lead" style="margin-top:14px">Sign-in is rate limited (<span class="code">AuthRateLimiter</span>). The status is only revealed <b>after</b> the password is right, so strangers cannot probe who has an account. Only <span class="code">APPROVED</span> accounts receive a JWT.</p>
+</section>
+
+<!-- 3 LIFECYCLE -->
+<section class="view" id="v-life">
+  <h2>3. Life of a notice</h2>
+  <p class="lead">A notice moves through states. Pick who is acting, then try the buttons. Wrong role? The backend answers 403, exactly like <span class="code">NoticeService</span> and <span class="code">NoticeAccessService</span> do.</p>
+  <div class="card" style="padding:8px"><svg viewBox="0 0 1000 340" width="100%" id="lifesvg" role="img" aria-label="Notice state machine"></svg></div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <h3>Control panel</h3>
+      <div class="row" id="actor"></div>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px;margin:12px 0"><input type="checkbox" id="future"> Publish date is in the future</label>
+      <div class="row" id="actions"></div>
+      <p style="color:var(--mute);font-size:13.5px;margin-bottom:0">Current state: <span class="tag" id="curstate"></span></p>
+    </div>
+    <div class="log" id="lifelog"></div>
+  </div>
+</section>
+
+<!-- 4 TARGETING -->
+<section class="view" id="v-target">
+  <h2>4. Who receives a notice?</h2>
+  <p class="lead">A notice has one or more <i>targets</i>. A person matches a target when every filled-in field equals theirs. Add targets and watch the matching people light up. This is what the live recipient count in the form does (<span class="code">TargetMatcher</span>).</p>
+  <div class="card">
+    <div class="row">
+      <label class="f">Target type<select id="tType"></select></label>
+      <label class="f">Role<select id="tRole"><option value="">any</option><option>FACULTY</option><option>STUDENT</option></select></label>
+      <label class="f">Department<select id="tDept"><option value="">any</option><option>CS</option><option>ME</option></select></label>
+      <label class="f">Semester<select id="tSem"><option value="">any</option><option>4</option><option>6</option></select></label>
+      <label class="f">Class<select id="tCls"><option value="">any</option><option>A</option><option>B</option></select></label>
+      <button class="btn pri" id="addT" style="align-self:end">Add target</button>
+    </div>
+    <div class="row" id="tChips" style="margin:14px 0"></div>
+    <div class="row" style="gap:18px;margin-bottom:12px"><div><div class="count" id="tCount">0</div><div style="color:var(--mute);font-size:13px">people notified</div></div><div id="tHint" style="color:var(--mute);font-size:14px;max-width:48ch"></div></div>
+    <div class="people" id="people"></div>
+  </div>
+  <p class="lead" style="margin-top:14px">Permission is also checked when the notice is saved (<span class="code">TargetPolicy</span>): a <b>teacher</b> can only reach students of their own department, an <b>HOD</b> only their own department, the <b>Principal / Admin</b> anyone.</p>
+</section>
+
+<!-- 5 REQUEST JOURNEY -->
+<section class="view" id="v-req">
+  <h2>5. One request, step by step</h2>
+  <p class="lead">What happens when an HOD clicks <b>Approve</b> on a teacher's notice: <span class="code">POST /api/notices/42/approve</span>. Press play, or click any step.</p>
+  <div class="row" style="margin-bottom:14px"><button class="btn pri" id="play">Play</button><button class="btn" id="prev">Back</button><button class="btn" id="next">Next</button><button class="btn" id="restart">Restart</button></div>
+  <div class="grid2">
+    <div class="card"><div class="steps" id="steps"><div class="rail"><i id="railfill"></i></div></div></div>
+    <div class="card" style="position:sticky;top:70px;align-self:start">
+      <h3 id="stTitle"></h3><p id="stText"></p><div id="stCode"></div>
+      <svg viewBox="0 0 400 70" width="100%" style="margin-top:12px" aria-hidden="true"><line x1="20" y1="35" x2="380" y2="35" stroke="var(--line)" stroke-width="4"/><g id="layerdots"></g><circle id="token" r="9" cy="35" cx="20" fill="var(--accent2)" style="transition:cx .6s"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- 6 SCHEDULER + PUBLIC -->
+<section class="view" id="v-pub">
+  <h2>6. Time, visibility and the public site</h2>
+  <p class="lead">A background job (<span class="code">NoticeScheduler</span>) runs every minute: <span class="code">SCHEDULED → PUBLISHED</span> when the publish date arrives, <span class="code">PUBLISHED → EXPIRED</span> after the expiry date. Drag the clock and switch visibility to see who can read the notice.</p>
+  <div class="card">
+    <div class="row" style="margin-bottom:12px"><span style="font-weight:700">Visibility:</span><button class="btn sel" data-vis="PRIVATE">Private (targets only)</button><button class="btn" data-vis="PUBLIC">Public (+ website)</button></div>
+    <div class="tl" id="tl"><div class="seg" style="left:0;width:30%;background:var(--violet)">Scheduled</div><div class="seg" style="left:30%;width:45%;background:var(--green)">Published</div><div class="seg" style="left:75%;width:25%;background:var(--mute)">Expired</div><div class="now" id="now" style="left:0"></div></div>
+    <input type="range" id="clock" min="0" max="100" value="10" aria-label="Time" style="margin-top:12px">
+    <div class="grid2" style="margin-top:14px">
+      <div class="card" style="background:var(--bg)"><h3>State</h3><span class="tag" id="pState"></span><p id="pWhy" style="color:var(--mute);font-size:14px"></p></div>
+      <div class="card" style="background:var(--bg)"><h3>Who can see it right now</h3><div id="pSee" style="display:grid;gap:8px"></div></div>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:14px">Public requests hit <span class="code">GET /api/public/**</span>, the only data URLs open without a token. <span class="code">PublicNoticeService</span> returns notices that are public <b>and</b> live. Attachments are downloaded through short-lived signed Cloudinary links.</p>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const el=(t,a={},h='')=>{const e=document.createElement(t);for(const k in a)e.setAttribute(k,a[k]);e.innerHTML=h;return e};
+/* tabs */
+const TABS=[['arch','Big picture'],['acc','Accounts'],['life','Notice lifecycle'],['target','Targeting'],['req','Request journey'],['pub','Time & public']];
+TABS.forEach(([id,t],i)=>{const b=el('button',{role:'tab','aria-selected':i==0,'data-id':id},t);b.onclick=()=>show(id);$('#tabs').append(b)});
+function show(id){$$('section.view').forEach(s=>s.classList.toggle('on',s.id=='v-'+id));$$('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.id==id));scrollTo({top:0});history.replaceState(null,'','#'+id);if(id!=='req')stopPlay()}
+
+/* 1 ARCH */
+const NODES=[
+ {id:'fe',x:20,y:150,w:150,h:110,c:'--blue',t:'React app',s:'Vite · Bootstrap',info:'The browser app. <b>App.jsx</b> chooses the page; <b>ProtectedRoute</b> hides pages by role; <b>AuthContext</b> keeps the JWT; <b>api.js</b> adds <span class="code">Authorization: Bearer …</span> to each call. Visitors see <b>PublicLayout</b>, members see <b>Layout</b>.'},
+ {id:'sec',x:210,y:150,w:160,h:110,c:'--accent2',t:'Security layer',s:'CORS · JWT · rules',info:'<b>JwtAuthenticationFilter</b> reads the token, <b>JwtService</b> validates it, then <b>SecurityConfig</b> decides: <span class="code">/api/auth/**</span> and <span class="code">GET /api/public/**</span> are open, audit logs are SUPER_ADMIN only, everything else needs a login. Stateless, no sessions.'},
+ {id:'ctl',x:410,y:150,w:160,h:110,c:'--violet',t:'Controllers',s:'REST /api/…',info:'Thin classes: <b>AuthController, NoticeController, PublicController, RegistrationController, DashboardController, AttachmentController, AiController…</b> They take the request, call a service, return JSON DTOs.'},
+ {id:'svc',x:610,y:150,w:160,h:110,c:'--accent',t:'Services',s:'business rules',info:'The brain. <b>NoticeService</b> (lifecycle), <b>TargetPolicy</b> + <b>TargetMatcher</b> (audience), <b>NoticeAccessService</b> (who may do what), <b>RegistrationService</b> (approver chain), <b>NotificationService</b>, <b>AuditService</b>.'},
+ {id:'db',x:810,y:150,w:150,h:110,c:'--gold',t:'MySQL',s:'JPA / Hibernate',info:'Tables from the entities: users, notices, notice_targets, departments, categories, notice_reads, acknowledgements, saved_notices, notifications, audit_logs, attachments. <b>DataSeeder</b> fills demo data on first start.'},
+ {id:'sch',x:610,y:20,w:160,h:55,c:'--mute',t:'Scheduler',s:'every 60 seconds',info:'<b>NoticeScheduler</b> calls <span class="code">processDueNotices</span>: publishes scheduled notices that are due and expires old ones. Notifies recipients when it publishes.'},
+ {id:'ai',x:360,y:335,w:160,h:70,c:'--violet',t:'Anthropic AI',s:'draft a notice',info:'<b>AiNoticeService</b> asks the AI to draft a title, text and audience from a short description. If it is unavailable, <b>MockAiSuggestionClient</b> answers instead, and <b>TargetPolicy</b> replaces any audience you are not allowed to use.'},
+ {id:'cl',x:485,y:335,w:160,h:70,c:'--blue',t:'Cloudinary',s:'attachments',info:'File uploads are checked by <b>FileValidator</b>, stored by <b>CloudinaryService</b>, and downloaded through short-lived signed links.'},
+ {id:'ml',x:660,y:335,w:160,h:70,c:'--green',t:'Gmail SMTP',s:'email (optional)',info:'<b>EmailService</b> sends mail in the background (<b>AsyncConfig</b>) for IMPORTANT/URGENT notices and password resets. Normal notices only create in-app notifications.'}
+];
+const ng=$('#nodes');
+NODES.forEach(n=>{const g=el('g',{class:'node',tabindex:0,role:'button','aria-label':n.t});
+ g.innerHTML=`<rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="14"/><rect x="${n.x}" y="${n.y}" width="8" height="${n.h}" rx="4" style="fill:var(${n.c});stroke:none"/><text class="t" x="${n.x+22}" y="${n.y+n.h/2-2}">${n.t}</text><text class="s" x="${n.x+22}" y="${n.y+n.h/2+16}">${n.s}</text>`;
+ const pick=()=>{$$('.node').forEach(x=>x.classList.remove('act'));g.classList.add('act');$('#archinfo').innerHTML=`<h3 style="color:var(${n.c})">${n.t}</h3><p style="margin:0">${n.info}</p>`};
+ g.onclick=pick;g.onkeydown=e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();pick()}};ng.append(g);if(n.id=='ctl')setTimeout(pick,0)});
+const pk=$('#packets');
+[['reqp',0,'--accent2',4,'r'],['reqp',2,'--accent2',4,'r'],['resp',1,'--green',4,'s'],['resp',3,'--green',4,'s'],['p-cloud',0,'--blue',3,'c'],['p-mail',1,'--green',3,'c'],['p-ai',2,'--violet',3,'c'],['p-sch',0.5,'--gold',3,'c']].forEach(([p,d,c,du])=>{
+ const ci=el('circle',{r:7,fill:`var(${c})`});ci.innerHTML=`<animateMotion dur="${du}s" begin="${d}s" repeatCount="indefinite"><mpath href="#${p}"/></animateMotion>`;pk.append(ci)});
+[['Request',170,172,'--accent2'],['Response',170,248,'--green']].forEach(([t,x,y,c])=>pk.append(el('text',{x:x+250,y,'font-size':12,fill:`var(${c})`,'font-weight':700},t+(t=='Request'?' →':' ←'))));
+
+/* 2 ACCOUNTS */
+let applicant='STUDENT',regState='PENDING';
+const APPS=[['STUDENT','Student'],['FACULTY','Teacher'],['HOD','HOD']];
+APPS.forEach(([k,t])=>{const b=el('button',{class:'btn'+(k==applicant?' sel':'')},'I am a '+t);b.onclick=()=>{applicant=k;regState='PENDING';$$('#applicant .btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');drawChain()};$('#applicant').append(b)});
+['hasCT','hasHod'].forEach(i=>$('#'+i).onchange=()=>{regState='PENDING';drawChain()});
+function route(){const ct=$('#hasCT').checked,hod=$('#hasHod').checked;
+ if(applicant=='STUDENT')return ct?['CT']:hod?['HOD']:['PRINCIPAL'];
+ if(applicant=='FACULTY')return hod?['HOD']:['PRINCIPAL'];
+ return['PRINCIPAL']}
+function drawChain(){const r=route()[0];$('#hasCT').parentElement.style.opacity=applicant=='STUDENT'?1:.35;$('#hasHod').parentElement.style.opacity=applicant=='HOD'?.35:1;
+ const full=applicant=='STUDENT'?[['CT','Class teacher'],['HOD','Dept HOD'],['PRINCIPAL','Principal']]:applicant=='FACULTY'?[['HOD','Dept HOD'],['PRINCIPAL','Principal']]:[['PRINCIPAL','Principal']];
+ const c=$('#chain');c.innerHTML='';c.append(el('div',{class:'link on'},'You ('+APPS.find(a=>a[0]==applicant)[1]+')'));
+ full.forEach(([k,t])=>{c.append(el('span',{class:'arrow'},'→'));c.append(el('div',{class:'link'+(k==r?' on':' skip')},t))});
+ $('#routeText').textContent='Your request goes to: '+({CT:'the class teacher of your class',HOD:'your department HOD',PRINCIPAL:'the Principal (nobody lower is available)'})[r];
+ const S={PENDING:['var(--gold)','Can register, but cannot sign in yet. Sign-in shows the status after the right password.'],APPROVED:['var(--green)','Can sign in and receives a JWT token.'],REJECTED:['var(--accent2)','Sees the rejection reason and may apply again.']};
+ $('#statusrow').innerHTML=['PENDING','APPROVED','REJECTED'].map(s=>`<span class="tag" style="background:${s==regState?S[s][0]:'var(--bg)'};color:${s==regState?'#10222b':'var(--mute)'};transition:.3s">${s}</span>`).join('');$('#statusnote').textContent=S[regState][1]}
+$('#approveBtn').onclick=()=>{regState='APPROVED';drawChain()};$('#rejectBtn').onclick=()=>{regState='REJECTED';drawChain()};$('#resetReg').onclick=()=>{regState='PENDING';drawChain()};
+$$('[data-pw]').forEach(b=>b.onclick=()=>{const L=$('#loginlog');const add=(t,c)=>L.append(el('div',{class:c},t));L.innerHTML='';
+ add('POST /api/auth/login','sys');
+ if(b.dataset.pw=='bad'){add('✗ 401 Invalid email or password (failure counted by the rate limiter)','err');return}
+ add('✓ password matches','okk');
+ if(regState=='APPROVED')add('✓ 200 OK, JWT token issued → stored in the browser → /dashboard','okk');
+ else add('✗ account is '+regState+': no token, only the status card is shown'+(regState=='REJECTED'?' with the reason':''),'err')});
+drawChain();
+
+/* 3 LIFECYCLE */
+const ST={DRAFT:[70,170,'--mute'],PENDING_APPROVAL:[250,60,'--gold'],APPROVED:[430,60,'--blue'],REJECTED:[250,280,'--accent2'],SCHEDULED:[590,170,'--violet'],PUBLISHED:[770,170,'--green'],EXPIRED:[930,80,'--mute'],ARCHIVED:[930,270,'--mute']};
+const ED=[['DRAFT','PENDING_APPROVAL','submit'],['PENDING_APPROVAL','APPROVED','approve'],['PENDING_APPROVAL','REJECTED','reject'],['REJECTED','DRAFT','edit'],['DRAFT','PUBLISHED','publish'],['APPROVED','SCHEDULED','later'],['APPROVED','PUBLISHED','now'],['SCHEDULED','PUBLISHED','scheduler'],['PUBLISHED','EXPIRED','scheduler'],['PUBLISHED','ARCHIVED','archive']];
+const ls=$('#lifesvg');
+ls.innerHTML='<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--mute)"/></marker></defs>';
+ED.forEach(([a,b,l])=>{const [x1,y1]=ST[a],[x2,y2]=ST[b];const dx=x2-x1,dy=y2-y1,d=Math.hypot(dx,dy),ux=dx/d,uy=dy/d;
+ const p=el('path',{d:`M${x1+ux*52} ${y1+uy*28} L${x2-ux*54} ${y2-uy*30}`,stroke:'var(--mute)','stroke-width':2,fill:'none','marker-end':'url(#ar)','data-e':a+'>'+b});ls.append(p);
+ ls.append(el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'font-size':11.5,fill:'var(--mute)','text-anchor':'middle'},l))});
+Object.entries(ST).forEach(([k,[x,y,c]])=>{const g=el('g',{'data-s':k});g.innerHTML=`<rect x="${x-52}" y="${y-26}" width="104" height="52" rx="12" fill="var(--panel)" stroke="var(${c})" stroke-width="2.5"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="${k.length>10?10.5:12.5}" font-weight="700" fill="var(--ink)">${k.replace('_',' ')}</text>`;ls.append(g)});
+let st='DRAFT',actor='FACULTY';
+['FACULTY','HOD','PRINCIPAL'].forEach(r=>{const b=el('button',{class:'btn'+(r==actor?' sel':'')},r=='FACULTY'?'Teacher':r=='HOD'?'HOD':'Principal / Admin');b.onclick=()=>{actor=r;$$('#actor .btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');L(`Now acting as ${b.textContent}`,'sys')};$('#actor').append(b)});
+const LL=(t,c)=>{$('#lifelog').append(el('div',{class:c||''},t));$('#lifelog').scrollTop=1e5};const L=LL;
+function paint(){$$('#lifesvg [data-s]').forEach(g=>{const on=g.dataset.s==st;g.querySelector('rect').setAttribute('fill',on?`var(${ST[st][2]})`:'var(--panel)');g.querySelector('text').setAttribute('fill',on?'#fff':'var(--ink)');if(on){g.animate([{transform:'scale(.9)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:450});g.style.transformOrigin=`${ST[st][0]}px ${ST[st][1]}px`}});
+ $('#curstate').textContent=st.replace('_',' ');$('#curstate').style.background=`var(${ST[st][2]})`;$('#curstate').style.color='#fff';
+ $$('#lifesvg path[data-e]').forEach(p=>p.setAttribute('stroke',p.dataset.e.startsWith(st+'>')?'var(--accent)':'var(--line)'))}
+function deny(m){L('✗ 403 '+m,'err');$('#lifelog').classList.remove('shake');void $('#lifelog').offsetWidth;$('#lifelog').classList.add('shake')}
+function release(who,viaApprove){if($('#future').checked){st='SCHEDULED';L('→ SCHEDULED: publish date is in the future. Audit: NOTICE_SCHEDULED','okk')}else{st='PUBLISHED';L('→ PUBLISHED: notifyPublished() creates in-app notifications (email too if URGENT/IMPORTANT). Audit: NOTICE_PUBLISHED','okk')}}
+const ACTS=[
+ ['Submit for approval',()=>{L('POST /notices/42/submit','sys');if(st!='DRAFT'&&st!='REJECTED')return deny('Only your own draft or rejected notices can be submitted');if(actor!='FACULTY')return deny('Only teachers submit; HOD and Principal publish directly');st='PENDING_APPROVAL';L('→ PENDING_APPROVAL. HODs of the department get a notification.','okk')}],
+ ['Publish',()=>{L('POST /notices/42/publish','sys');if(!(st=='DRAFT'||st=='APPROVED'))return deny('You cannot publish this notice in its current state');if(actor=='FACULTY')return deny('Faculty notices must be submitted for HOD approval');release()}],
+ ['Approve',()=>{L('POST /notices/42/approve','sys');if(st!='PENDING_APPROVAL')return deny('Only a pending notice can be approved');if(actor!='HOD')return deny('Only the HOD of this department can approve a pending notice');L('→ APPROVED, reviewer + time recorded','okk');st='APPROVED';release()}],
+ ['Reject',()=>{L('POST /notices/42/reject {reason}','sys');if(st!='PENDING_APPROVAL')return deny('Only a pending notice can be rejected');if(actor!='HOD')return deny('Only the HOD of this department can reject a pending notice');st='REJECTED';L('→ REJECTED. Teacher is notified with the reason.','okk')}],
+ ['Edit & resubmit',()=>{L('PUT /notices/42','sys');if(st!='REJECTED')return deny('Nothing to fix: only rejected notices go back to draft');st='DRAFT';L('→ DRAFT again, rejection reason cleared','okk')}],
+ ['Scheduler tick (+1 min)',()=>{L('⏱ NoticeScheduler.run()','sys');if(st=='SCHEDULED'){st='PUBLISHED';L('→ publish date reached: PUBLISHED, recipients notified','okk')}else if(st=='PUBLISHED'){st='EXPIRED';L('→ expiry date reached: EXPIRED','okk')}else L('Nothing due.','sys')}],
+ ['Archive',()=>{L('POST /notices/42/archive','sys');if(st!='PUBLISHED'&&st!='EXPIRED')return deny('Only live or expired notices can be archived');if(actor=='FACULTY')return deny('Only the author or leadership may archive');st='ARCHIVED';L('→ ARCHIVED, hidden from feeds','okk')}],
+ ['Start over',()=>{st='DRAFT';$('#lifelog').innerHTML='';L('New draft created. Audit: NOTICE_CREATED','sys')}]
+];
+ACTS.forEach(([t,f])=>{const b=el('button',{class:'btn'},t);b.onclick=()=>{f();paint()};$('#actions').append(b)});
+L('A new draft exists. Pick a role, then try Submit or Publish.','sys');paint();
+
+/* 4 TARGETING */
+const P=[['Principal','PRINCIPAL','',0,''],['Dr. Rao','HOD','CS',0,''],['Prof. Iyer','HOD','ME',0,''],['Ms. Shah','FACULTY','CS',0,''],['Mr. Khan','FACULTY','CS',0,''],['Ms. Patil','FACULTY','ME',0,''],
+ ['Asha','STUDENT','CS',6,'A'],['Ben','STUDENT','CS',6,'A'],['Chitra','STUDENT','CS',6,'A'],['Dev','STUDENT','CS',6,'B'],['Esha','STUDENT','CS',6,'B'],['Farid','STUDENT','CS',4,'A'],['Gita','STUDENT','CS',4,'A'],['Hari','STUDENT','ME',6,'A'],['Isha','STUDENT','ME',6,'A'],['Jay','STUDENT','ME',4,'A'],['Kiran','STUDENT','ME',4,'A']];
+const TT={COLLEGE:'Whole college',ROLE:'Role',DEPARTMENT:'Department',ROLE_DEPARTMENT:'Role in department',SEMESTER:'Semester',CLASS:'Class'};
+Object.entries(TT).forEach(([k,v])=>$('#tType').append(el('option',{value:k},v)));
+const NEED={COLLEGE:[],ROLE:['tRole'],DEPARTMENT:['tDept'],ROLE_DEPARTMENT:['tRole','tDept'],SEMESTER:['tDept','tSem'],CLASS:['tDept','tSem','tCls']};
+function syncSel(){const n=NEED[$('#tType').value];['tRole','tDept','tSem','tCls'].forEach(i=>{$('#'+i).parentElement.style.opacity=n.includes(i)?1:.3;$('#'+i).disabled=!n.includes(i)})}
+$('#tType').onchange=syncSel;syncSel();
+let TG=[{type:'DEPARTMENT',dept:'CS'}];
+function match(p,t){return(!t.role||p[1]==t.role)&&(!t.dept||p[2]==t.dept)&&(!t.sem||p[3]==t.sem)&&(!t.cls||p[4]==t.cls)}
+function drawT(){const c=$('#tChips');c.innerHTML='';TG.forEach((t,i)=>{const d=[t.role,t.dept&&('dept '+t.dept),t.sem&&('sem '+t.sem),t.cls&&('class '+t.cls)].filter(Boolean).join(', ')||'everyone';const ch=el('span',{class:'chip'},`${TT[t.type]}: ${d} <button aria-label="remove">×</button>`);ch.querySelector('button').onclick=()=>{TG.splice(i,1);drawT()};c.append(ch)});
+ const pe=$('#people');pe.innerHTML='';let n=0;P.forEach(p=>{const hit=TG.some(t=>match(p,t));if(hit)n++;pe.append(el('div',{class:'person'+(hit?' hit':'')},`<b>${p[0]}</b>${p[1].toLowerCase()}${p[2]?' · '+p[2]:''}${p[3]?' · S'+p[3]+p[4]:''}`))});
+ $('#tCount').textContent=n;$('#tHint').textContent=TG.length?'Several targets are combined (a person only needs to match one).':'Add at least one target. A private notice cannot be saved without one.'}
+$('#addT').onclick=()=>{const ty=$('#tType').value,n=NEED[ty];const t={type:ty};if(n.includes('tRole')&&$('#tRole').value)t.role=$('#tRole').value;if(n.includes('tDept')&&$('#tDept').value)t.dept=$('#tDept').value;if(n.includes('tSem')&&$('#tSem').value)t.sem=+$('#tSem').value;if(n.includes('tCls')&&$('#tCls').value)t.cls=$('#tCls').value;if(['SEMESTER','CLASS'].includes(ty)&&!t.role)t.role='STUDENT';TG.push(t);drawT()};
+drawT();
+
+/* 5 REQUEST */
+const REQ=[
+ ['React: button click','NoticeDetails.jsx calls <span class="code">api.approveNotice(42)</span>. The page only showed the button because the user is an HOD, but that is just convenience, not security.','frontend/src/pages/NoticeDetails.jsx',0],
+ ['api.js adds the token','The wrapper in <b>services/api.js</b> adds <span class="code">Authorization: Bearer &lt;JWT&gt;</span> and sends <span class="code">POST /api/notices/42/approve</span> to the backend (port 8080). Browser first passes CORS (allowed origin from config).','frontend/src/services/api.js',0],
+ ['JwtAuthenticationFilter','Runs before everything. It reads the header, asks <b>JwtService</b> to validate signature and expiry, loads the user and checks the account is still APPROVED. The user is put into Spring’s security context.','config/JwtAuthenticationFilter.java',1],
+ ['SecurityConfig rules','Not an open URL, so <span class="code">anyRequest().authenticated()</span> applies. No valid user here would give a JSON 401 from <b>JsonSecurityHandlers</b>.','config/SecurityConfig.java',1],
+ ['NoticeController','<span class="code">@PostMapping("/{id}/approve")</span> receives the id and calls <span class="code">noticeService.approve(id)</span>. No logic here.','controller/NoticeController.java',2],
+ ['NoticeService.approve','Loads the notice, then asks <b>NoticeAccessService.canReview</b>: is the user an HOD, of this department, and is the notice PENDING_APPROVAL? If not → 403 NoticeApprovalException.','service/NoticeService.java',3],
+ ['State change + release','Sets reviewer, time and status APPROVED, then <b>releaseOrSchedule</b>: future publish date → SCHEDULED, else PUBLISHED right now. Runs inside one @Transactional.','service/NoticeService.java',3],
+ ['Save to MySQL','JPA updates the <b>notices</b> row and writes the audit entry (<b>AuditService</b> → <b>audit_logs</b>). If anything fails, the whole transaction rolls back.','repository + entity',4],
+ ['Notify people','<b>NotificationService.notifyPublished</b> finds all users matching the notice targets, creates in-app notifications, and queues emails (async) for IMPORTANT/URGENT. The author gets “Approved: …”.','service/NotificationService.java',3],
+ ['Response to browser','A <b>NoticeDetailResponse</b> DTO goes back as JSON. React shows a toast, updates the page, and the notification bell count rises for recipients.','dto/NoticeDtos.java',0]
+];
+const LAY=['Browser','Security','Controller','Service','MySQL'];
+LAY.forEach((n,i)=>{const x=20+i*90;$('#layerdots').append(el('circle',{cx:x,cy:35,r:5,fill:'var(--mute)'}));$('#layerdots').append(el('text',{x,y:60,'text-anchor':'middle','font-size':11,fill:'var(--mute)'},n))});
+REQ.forEach((r,i)=>{const s=el('div',{class:'step'},`<div class="dot">${i+1}</div><div><div class="ttl">${r[0]}</div></div>`);s.onclick=()=>{go(i);stopPlay()};$('#steps').append(s)});
+let cur=0,timer=null;
+function go(i){cur=Math.max(0,Math.min(REQ.length-1,i));$$('.step').forEach((s,k)=>{s.classList.toggle('cur',k==cur);s.classList.toggle('done',k<cur)});
+ const r=REQ[cur];$('#stTitle').textContent=`${cur+1}. ${r[0]}`;$('#stText').innerHTML=r[1];$('#stCode').innerHTML=`<span class="code">${r[2]}</span>`;$('#token').setAttribute('cx',20+r[3]*90);
+ $('#railfill').style.height=(cur/(REQ.length-1)*100)+'%'}
+function stopPlay(){clearInterval(timer);timer=null;$('#play').textContent='Play'}
+$('#play').onclick=()=>{if(timer)return stopPlay();if(cur>=REQ.length-1)go(0);$('#play').textContent='Pause';timer=setInterval(()=>{if(cur>=REQ.length-1)return stopPlay();go(cur+1)},2600)};
+$('#next').onclick=()=>{go(cur+1);stopPlay()};$('#prev').onclick=()=>{go(cur-1);stopPlay()};$('#restart').onclick=()=>{go(0);stopPlay()};go(0);
+
+/* 6 TIME */
+let vis='PRIVATE';
+$$('[data-vis]').forEach(b=>b.onclick=()=>{vis=b.dataset.vis;$$('[data-vis]').forEach(x=>x.classList.toggle('sel',x==b));drawP()});
+$('#clock').oninput=drawP;
+function drawP(){const v=+$('#clock').value;$('#now').style.left=v+'%';const s=v<30?'SCHEDULED':v<75?'PUBLISHED':'EXPIRED';const col={SCHEDULED:'--violet',PUBLISHED:'--green',EXPIRED:'--mute'}[s];
+ const t=$('#pState');t.textContent=s;t.style.background=`var(${col})`;t.style.color='#fff';
+ $('#pWhy').textContent={SCHEDULED:'Waiting for its publish date. The scheduler checks every minute.',PUBLISHED:'Live. Targeted members were notified at the moment it became PUBLISHED.',EXPIRED:'Expiry date passed. It moves to history; the public site stops showing it.'}[s];
+ const live=s=='PUBLISHED',hist=s=='EXPIRED';
+ const row=(who,ok,note)=>`<div style="display:flex;gap:10px;align-items:center"><span class="tag" style="background:${ok?'var(--green)':'var(--bad)'};color:#fff;min-width:64px;text-align:center">${ok?'Yes':'No'}</span><span><b>${who}</b><br><span style="color:var(--mute);font-size:13px">${note}</span></span></div>`;
+ $('#pSee').innerHTML=row('Targeted member',live||hist,live?'In feed and notifications':hist?'In notice history only':'Not yet released')+row('Other member (not targeted)',false,'Private to its audience')+row('Anonymous visitor',vis=='PUBLIC'&&live,vis=='PUBLIC'?(live?'Listed on /public-notices':'Public site only shows live notices'):'Private notices are never on the public site')}
+drawP();
+const start=(location.hash||'#arch').slice(1);show(TABS.some(t=>t[0]==start)?start:'arch');
+</script>
+</body>
+</html>
